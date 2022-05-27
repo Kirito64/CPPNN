@@ -13,7 +13,7 @@ typedef struct{
 } NeuralNetwork;
 
 typedef NeuralNetwork NN;
-NN* createNetwork(int input, int hidden, double learningRate);
+NN* createNetwork(int input, int hidden,int output, double learningRate);
 void networkTrain(NN* net, Matrix* inputdata, Matrix* outputdata);
 Matrix* networkPredict(NN* net, Matrix* input);
 void networkSave(NN* net, char* filename);

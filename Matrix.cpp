@@ -1,22 +1,19 @@
 #include "matrix.hpp"
-#include <bits/stdc++.h>
+#include <vector>
+#include <math.h>
+#include<iostream>
 #define MAXCHAR 1000 
 
 using namespace std;
 
 Matrix* createMatrix(int rows, int columns){
-	Matrix* matrix = (Matrix*)malloc(sizeof(Matrix*));
-	std::vector<vector<double>> entries;
+	Matrix *matrix = (Matrix *)malloc(sizeof(Matrix));
 	matrix->rows = rows;
 	matrix->columns = columns;
-
-	for(int i = 0; i<rows; i++){
-		vector<double> x(columns);
-		entries.push_back(x);
+	matrix->entries = (double**)malloc(rows * sizeof(double*));
+	for (int i = 0; i < rows; i++) {
+		matrix->entries[i] =(double*) malloc(columns * sizeof(double));
 	}
-
-	matrix->entries  = entries;
-
 	return matrix;
 }
 
@@ -29,7 +26,9 @@ void matrixFill(Matrix* m, int n){
 }
 
 void matrixFree(Matrix* m){
-	vector<vector<double> >().swap(m->entries);
+	for (int i = 0; i < m->rows; i++) {
+		free(m->entries[i]);
+	}
 	free(m);
 	m = NULL;
 }
@@ -44,16 +43,16 @@ void matrixPrint(Matrix* m){
 	}
 }
 
-Matrix* matrixCopy(Matrix* m){
-	Matrix* copy = createMatrix(m->rows, m->columns);
+Matrix* copyMatrix(Matrix* m){
+	Matrix* c = createMatrix(m->rows, m->columns);
 
 	for(int i=0; i<m->rows; i++){
 		for(int j= 0; j<m->columns; j++){
-			copy->entries[i][j] = m->entries[i][j];
+			c->entries[i][j] = m->entries[i][j];
 		}
 	}
 
-	return copy;
+	return c;
 }
 
 void matrixSave(Matrix* m, char* filename){
@@ -100,15 +99,15 @@ double uniformDistribution(double low, double high){
 	double diff = high - low;
 	int scale = 10000;
 	int scaledDiff = (int)(diff*scale);
-	retun low + (1.0* (rand()%scaledDiff)/scale);
+	return low + (1.0* (rand()%scaledDiff)/scale);
 }
 
-void matrixRandom(Matrix* m){
+void matrixRandom(Matrix* m, int n){
 	double min = -1.0/sqrt(n);
 	double max = 1.0/sqrt(n);
 
 	for(int i = 0; i< m->rows; i++){
-		for(int j = 0; j< m->colour; j++){
+		for(int j = 0; j< m->columns; j++){
 			m->entries[i][j] = uniformDistribution(min,max);
 		}
 	}
@@ -140,15 +139,15 @@ Matrix* matrixFlatten(Matrix* m, int axis){
 
 	}
 	else if(axis == 1){
-		mat = ceateMatrix(1, m->columns*m->rows)
+		mat = createMatrix(1, m->columns*m->rows);
 	}
 	else{
 		cout<<"Argumen to matrixFlatten invalid"<<endl;
 		exit(EXIT_FAILURE);
 	}
 
-	for(int i = 0 i<m->rows; i++){
-		for(int j = 0; j < m->column; j++){
+	for(int i = 0 ;i<m->rows; i++){
+		for(int j = 0; j < m->columns; j++){
 			if(axis == 0)
 				mat->entries[i*m->columns + j][0] = m->entries[i][j];
 			else

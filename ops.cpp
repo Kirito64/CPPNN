@@ -1,10 +1,13 @@
 #include "ops.hpp"
-#include<bits/stdc++.h>
+#include "Matrix.hpp"
+#include<math.h>
+#include<vector>
+#include<iostream>
 
 using namespace std;
 
 int checkDimensions(Matrix* m1, Matrix* m2){
-	if(m1->rows == m2->rows && m1->colums == m2->colums)
+	if(m1->rows == m2->rows && m1->columns == m2->columns)
 		return 1;
 	else return 0;
 }
@@ -12,9 +15,9 @@ int checkDimensions(Matrix* m1, Matrix* m2){
 Matrix* multiply(Matrix* m1, Matrix* m2){
 
 	if(checkDimensions(m1, m2)){
-		Matrix* m = createMatrix(m1->rows, m1->colums);
+		Matrix* m = createMatrix(m1->rows, m1->columns);
 		for(int i = 0; i < m1->rows; i++){
-			for(int j = 0; j < m1->colums; j++){
+			for(int j = 0; j < m2->columns; j++){
 				m->entries[i][j] = m1->entries[i][j]*m2->entries[i][j];
 			}
 		}
@@ -22,16 +25,16 @@ Matrix* multiply(Matrix* m1, Matrix* m2){
 		return m;
 	}
 	else{
-		cout<<"Dimension mismatch"<<endl;
+		cout<<"Dimension mismatch multiply "<<m1->rows<<" "<<m1->columns<<" "<<m2->rows<<" "<<m2->columns<<endl;
 		exit(1);
 	}
 }
 
 Matrix* add(Matrix* m1, Matrix* m2){
 	if(checkDimensions(m1, m2)){
-		Matrix* m = createMatrix(m1->rows, m1->colums);
+		Matrix* m = createMatrix(m1->rows, m1->columns);
 		for(int i = 0; i < m1->rows; i++){
-			for(int j = 0; j < m1->colums; j++){
+			for(int j = 0; j < m2->columns; j++){
 				m->entries[i][j] = m1->entries[i][j]+m2->entries[i][j];
 			}
 		}
@@ -39,16 +42,16 @@ Matrix* add(Matrix* m1, Matrix* m2){
 		return m;
 	}
 	else{
-		cout<<"Dimension mismatch"<<endl;
+		cout<<"Dimension mismatch add "<<m1->rows<<" "<<m1->columns<<" "<<m2->rows<<" "<<m2->columns<<endl;
 		exit(1);
 	}
 }
 
 Matrix* subtract(Matrix* m1, Matrix* m2){
 	if(checkDimensions(m1, m2)){
-		Matrix* m = createMatrix(m1->rows, m1->colums);
+		Matrix* m = createMatrix(m1->rows, m1->columns);
 		for(int i = 0; i < m1->rows; i++){
-			for(int j = 0; j < m1->colums; j++){
+			for(int j = 0; j < m2->columns; j++){
 				m->entries[i][j] = m1->entries[i][j]-m2->entries[i][j];
 			}
 		}
@@ -56,7 +59,7 @@ Matrix* subtract(Matrix* m1, Matrix* m2){
 		return m;
 	}
 	else{
-		cout<<"Dimension mismatch"<<endl;
+		cout<<"Dimension mismatch subtract "<<m1->rows<<" "<<m1->columns<<" "<<m2->rows<<" "<<m2->columns<<endl;
 		exit(1);
 	}
 }
@@ -64,8 +67,7 @@ Matrix* subtract(Matrix* m1, Matrix* m2){
 Matrix* dot(Matrix* m1, Matrix* m2){
 	
 	if(m1->columns == m2->rows){
-		Matrix* m = createMatrix(m1->columns, m1->columns);
-
+		Matrix* m = createMatrix(m1->rows, m2->columns);
 		for (int i = 0; i < m1->rows; i++) {
 			for (int j = 0; j < m2->columns; j++) {
 				double sum = 0;
@@ -79,14 +81,14 @@ Matrix* dot(Matrix* m1, Matrix* m2){
 	}
 
 	else{
-		cout<<"Dimension Mismatch"<<endl;
+		cout<<"Dimension mismatch dot "<<m1->rows<<" "<<m1->columns<<" "<<m2->rows<<" "<<m2->columns<<endl;
 		exit(1);
 	}
 }
 
 
 Matrix* scale(double n , Matrix* m){
-	Matrix* mat = copy(m);
+	Matrix* mat = copyMatrix(m);
 	for(int i = 0; i<mat->rows; i++){
 		for(int j = 0; j<mat->columns; j++){
 			mat->entries[i][j] *= n;
@@ -97,7 +99,7 @@ Matrix* scale(double n , Matrix* m){
 }
 
 Matrix* addScalar(double n , Matrix* m){
-	Matrix* mat = copy(m);
+	Matrix* mat = copyMatrix(m);
 	for(int i = 0; i<mat->rows; i++){
 		for(int j = 0; j<mat->columns; j++){
 			mat->entries[i][j] += n;
@@ -108,7 +110,7 @@ Matrix* addScalar(double n , Matrix* m){
 }
 
 Matrix* transpose(Matrix* m) {
-	Matrix* mat = matrix_create(m->cols, m->rows);
+	Matrix* mat = createMatrix(m->columns, m->rows);
 	for (int i = 0; i < m->rows; i++) {
 		for (int j = 0; j < m->columns; j++) {
 			mat->entries[j][i] = m->entries[i][j];
@@ -119,7 +121,7 @@ Matrix* transpose(Matrix* m) {
 
 Matrix* apply(double (*func)(double), Matrix* m){
 
-	Matrix* mat = copy(m);
+	Matrix* mat = copyMatrix(m);
 	for(int i = 0; i<m->rows; i++){
 		for(int j = 0; j<m->columns; j++){
 			mat->entries[i][j] = (*func)(m->entries[i][j]);

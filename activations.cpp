@@ -1,5 +1,5 @@
 #include "activations.hpp"
-#include<math.h>
+#include <math.h>
 #include "ops.hpp"
 
 double sigmoid(double input){
@@ -26,4 +26,13 @@ Matrix* softmax(Matrix* m){
 	return mat;
 }
 
-Matrix* sigmoidPrime()
+Matrix* sigmoidPrime(Matrix* m){
+	Matrix* mat = createMatrix(m->rows, m->columns);
+	matrixFill(mat, 1);
+	Matrix* subtracted = subtract(mat, m);
+	Matrix* multiplied = multiply(m, subtracted);
+	
+	matrixFree(subtracted);
+	matrixFree(mat);
+	return multiplied;
+}
