@@ -6,24 +6,41 @@
 
 #define MAXCHAR  1000
 
-NN* createNetwork(int input, int hidden, int output, double learningRate){
+NN* createNetwork(int input, int hidden, int output, double learningRate, int bias){
 	NN* net = (NN*) malloc(sizeof(NN*)+100);
-	net->input = input;
+	
+
+	net->bias = bias;
+	net->input = input+bias;
 	net->hidden = hidden;
 	net->output = output;
 	net->learningRate = learningRate;
-	Matrix* hidden_layer = createMatrix(hidden, input);
+	Matrix* hidden_layer = createMatrix(hidden, input+bias);
 	Matrix* output_layer = createMatrix(output, hidden);
 	matrixRandom(hidden_layer, hidden);
 	matrixRandom(output_layer, output);
 	net->hiddenWeights = hidden_layer;
 	net->outputWeights = output_layer;
 	return net;
-}
 
+	
+}
 void networkTrain(NN* net, Matrix* input, Matrix* output){
+
+	Matrix* x;
+	if(net->bias){
+		x = createMatrix(input->rows+net->bias, input->columns);
+		for(int i = 0; i < input->rows; i++){
+			x->entries[i][0] = input->entries[i][0];
+		}
+		x->entries[input->rows][0] = 1;
+		
+	}
+	else{
+		x = input;
+	}
 	//forward propogation
-	Matrix* hiddenInputs = dot(net->hiddenWeights, input);
+	Matrix* hiddenInputs = dot(net->hiddenWeights, x);
 	Matrix* hiddenOutputs = apply(sigmoid, hiddenInputs);
 	Matrix* outputInputs = dot(net->outputWeights,hiddenOutputs);
 	Matrix* outputOutputs = apply(sigmoid, outputInputs);
@@ -42,7 +59,7 @@ void networkTrain(NN* net, Matrix* input, Matrix* output){
 	
 	matrixFree(net->outputWeights);
 	net->outputWeights = addedMat;
-
+	
 	matrixFree(sigmoidprimemat);
 	matrixFree(mul);
 	matrixFree(transed);
@@ -51,10 +68,9 @@ void networkTrain(NN* net, Matrix* input, Matrix* output){
 
 
 	//backpropagation hidden layer with
-
 	sigmoidprimemat = sigmoidPrime(hiddenOutputs);
 	mul = multiply(hiddenErrors, sigmoidprimemat);
-	transed = transpose(input);
+	transed = transpose(x);
 	dotmat = dot(mul, transed);
 	scaledMat = scale(net->learningRate, dotmat);
 	addedMat = add(net->hiddenWeights, scaledMat);
@@ -80,7 +96,19 @@ void networkTrain(NN* net, Matrix* input, Matrix* output){
 
 
 Matrix* networkPredict(NN* net, Matrix* input){
-	Matrix* hiddenInputs = dot(net->hiddenWeights, input);
+	Matrix* x;
+	if(net->bias){
+		x = createMatrix(input->rows+net->bias, input->columns);
+		for(int i = 0; i < input->rows; i++){
+			x->entries[i][0] = input->entries[i][0];
+		}
+		x->entries[input->rows][0] = 1;
+		
+	}
+	else{
+		x = input;
+	}
+	Matrix* hiddenInputs = dot(net->hiddenWeights, x);
 	Matrix* hiddenOutputs = apply(sigmoid, hiddenInputs);
 	Matrix* outputInputs = dot(net->outputWeights,hiddenOutputs);
 	Matrix* outputOutputs = apply(sigmoid, outputInputs);

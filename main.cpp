@@ -31,7 +31,7 @@ int main(){
 	outputs->entries[2][0] = 1; 
 	outputs->entries[3][0] = 0; 
 
-	NN* network= createNetwork(2, 3, 1, 0.4);
+	NN* network= createNetwork(2, 3, 1, 0.4, 1);
 	cout<<"training starting"<<endl;
 	for(int j = 0; j<100; j++){
 		for(int i = 0; i<inputs->rows; i++){
